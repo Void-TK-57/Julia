@@ -45,11 +45,4 @@ function features_names(features, degree, include_bias)
 end
 
 
-terror_function(features, degree, include_bias) = [ join( filter(x->x!="", [ n_str(features[i], (addcounts!(Dict{Int64,Int64}(), [v...]))[i-1]) for i in 1:length(features) ]), '.')  for v in (chain([filter( issorted, Any[product(fill(0:length(features)-1, n)...)...]) for n in Int(!include_bias):degree]...) ) ] ]
-
-
-
-function powers_(n_features, degree, include_bias)
-    combinations = comb(n_features, degree, include_bias)
-    return vcat([bincount(c+1, minlength=n_features) for c in combinations]...)
-end
+# terror_function(features, degree, include_bias) = [ join( filter(x->x!="", [ n_str(features[i], (addcounts!(Dict{Int64,Int64}(), [v...]))[i-1]) for i in 1:length(features) ]), '.')  for v in (chain([filter( issorted, Any[product(fill(0:length(features)-1, n)...)...]) for n in Int(!include_bias):degree]...) ) ] ]
