@@ -1,4 +1,0 @@
-[deps]
-Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
-Pandas = "eadc2687-ae89-51f9-a5d9-86b5a6373a9c"
-TensorFlow = "1d978283-2c37-5f34-9a8e-e9c0ece82495"

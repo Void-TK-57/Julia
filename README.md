@@ -1,2 +1,2 @@
 # Julia
-Repository for test in Julia
+Repository for Learning and Implement Concepts in Julia
