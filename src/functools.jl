@@ -19,3 +19,37 @@ function power_features(X::AbstractArray{T}, degree::Int64, include_bias::Bool=f
     end
     return X_
 end
+
+# feature name function
+function n_str(str, n)
+    if n == 0
+        return ""
+    elseif n == 1
+        return str
+    else
+        return str*"^"*string(n)
+    end
+end
+
+
+
+function features_names(features, degree, include_bias)
+    # empty dict function
+    empty_dict() = Dict{Int64,Int64}()
+    # function to get feature string based on the map
+    calculate_str(map_combination) = join( filter(x->x!="", [ n_str(features[i], map_combination[i-1]) for i in 1:length(features) ]), '.')
+    # get features based on the combinations
+    features = [ calculate_str( addcounts!(empty_dict(), [v...]) )  for v in comb(length(features), degree, include_bias)] ]
+    # return the features
+    return features
+end
+
+
+terror_function(features, degree, include_bias) = [ join( filter(x->x!="", [ n_str(features[i], (addcounts!(Dict{Int64,Int64}(), [v...]))[i-1]) for i in 1:length(features) ]), '.')  for v in (chain([filter( issorted, Any[product(fill(0:length(features)-1, n)...)...]) for n in Int(!include_bias):degree]...) ) ] ]
+
+
+
+function powers_(n_features, degree, include_bias)
+    combinations = comb(n_features, degree, include_bias)
+    return vcat([bincount(c+1, minlength=n_features) for c in combinations]...)
+end
