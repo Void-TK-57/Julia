@@ -26,4 +26,8 @@ function main()
 
 end
 
-main()
+function test()
+    println(features_names( ["X", "Y", "Z"], 2, false))
+end
+
+test()

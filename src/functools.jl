@@ -1,4 +1,5 @@
 using IterTools
+using StatsBase
 
 # combinations of indices function
 comb(n_features, degree, include_bias) = chain([filter(issorted, Any[product(fill(0:n_features-1, n)...)...]) for n in Int(!include_bias):degree]...)
@@ -31,15 +32,21 @@ function n_str(str, n)
     end
 end
 
-
+function empty_dict(n::Int64)
+    # create empty dict
+    dict = Dict{Int64,Int64}()
+    # for each value, create key with 0
+    for k in 0:n-1
+        dict[k] = 0
+    end
+    return dict
+end
 
 function features_names(features, degree, include_bias)
-    # empty dict function
-    empty_dict() = Dict{Int64,Int64}()
     # function to get feature string based on the map
     calculate_str(map_combination) = join( filter(x->x!="", [ n_str(features[i], map_combination[i-1]) for i in 1:length(features) ]), '.')
     # get features based on the combinations
-    features = [ calculate_str( addcounts!(empty_dict(), [v...]) )  for v in comb(length(features), degree, include_bias)] ]
+    features = [ calculate_str( addcounts!(empty_dict(length(features)), [v...]) )  for v in comb(length(features), degree, include_bias) ]
     # return the features
     return features
 end
