@@ -20,7 +20,9 @@ function main()
     println(head(data))
     degree = 2
     include_bias = true
-    coefs = linear_regression(Matrix(data[[:x]]), data[:y], degree, include_bias)
+    model = linear_regression(Matrix(data[[:x]]), data[:y], degree, include_bias)
+    println(model)
+    coefs = model.coefficients
     println(rename(DataFrame(Matrix( transpose( coefs ) ) ), features_names(["X"], degree, include_bias) ))
     display( scatter(data[:x], data[:y]) )
 
