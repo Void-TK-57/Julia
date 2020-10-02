@@ -16,18 +16,14 @@ end
 
 function main()
     data::DataFrame = load_data("csv/linear/train.csv")
-    data[:y] = data[:y].+50
+    data[:y] = data[:y].+20
     println(head(data))
-    x = Matrix(data[[:x]])
-    model = lm(power_features(x, 1, true), data[:y])
-    println(model)
-    println(coef(model))
+    degree = 2
+    include_bias = true
+    coefs = linear_regression(Matrix(data[[:x]]), data[:y], degree, include_bias)
+    println(rename(DataFrame(Matrix( transpose( coefs ) ) ), features_names(["X"], degree, include_bias) ))
     display( scatter(data[:x], data[:y]) )
 
 end
 
-function test()
-    println(features_names( ["X", "Y", "Z"], 2, false))
-end
-
-test()
+main()
