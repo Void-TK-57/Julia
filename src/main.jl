@@ -31,4 +31,11 @@ function main()
     display(plt)
 end
 
-main()
+function test()
+    sample = 1:10
+    println(sample)
+    scale = min_max_scale(sample[:, :])[:]
+    println(scale)
+end
+
+test()
