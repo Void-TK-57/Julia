@@ -2,9 +2,10 @@
 using DataFrames
 using CSV
 using Plots
+theme(:dark)
 using GLM
 
-include("machine_learning/regression.jl")
+include("machine_learning/model.jl")
 include("functools.jl")
 
 # set data folder
@@ -15,17 +16,19 @@ function load_data(path::String)::DataFrame
 end
 
 function main()
-    data::DataFrame = load_data("csv/linear/train.csv")
-    data[:y] = data[:y].+20
-    println(head(data))
-    degree = 2
+    data::DataFrame = load_data("csv/Concrete_Data_Yeh.csv")
+    target = "csMPa"
+    numerical = ["cement","slag","flyash","water","superplasticizer","coarseaggregate","fineaggregate","age"]
+    categorical = String[]
+    degree = 3
     include_bias = true
-    model = linear_regression(Matrix(data[[:x]]), data[:y], degree, include_bias)
-    println(model)
-    coefs = model.coefficients
-    println(rename(DataFrame(Matrix( transpose( coefs ) ) ), features_names(["X"], degree, include_bias) ))
-    display( scatter(data[:x], data[:y]) )
-
+    model = LinearModel(data, target, numerical, categorical, degree, include_bias)
+    p = predict(model, data)
+    plt = scatter(data[:csMPa], p)
+    # construct a identity line
+    interval = [min(p...), max(p...)]
+    plot!(interval, interval)
+    display(plt)
 end
 
 main()

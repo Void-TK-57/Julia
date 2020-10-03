@@ -42,7 +42,7 @@ function empty_dict(n::Int64)
     return dict
 end
 
-function features_names(features, degree, include_bias)
+function features_names(features::Array{String,1}, degree::Int64, include_bias::Bool)::Array{String,1}
     # function to get feature string based on the map
     calculate_str(map_combination) = join( filter(x->x!="", [ n_str(features[i], map_combination[i-1]) for i in 1:length(features) ]), '.')
     # get features based on the combinations
