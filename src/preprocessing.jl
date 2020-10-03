@@ -1,18 +1,41 @@
+# use packages
 using DataFrames
-include("../functools.jl")
+using StatsBase
 
-abstract type AbstractPreprocessing end
+# include own files
+include("functools.jl")
 
-# function to do a min max scaling
-function min_max_scale(X::Array{T,2}, min_interval::Int64=0, max_interval::Int64=1)::Array{T,2} where {T <: Number}
-    # transpose first
-    Xt = transpose(X)
-    # calcualte minimum and maximum values per column
-    min_ = min_cols(Xt)
-    max_ = max_cols(Xt)
-    # scale it by the max and min values, and the to the ranges passed
-    Xt_scaled = (Xt.-min_) ./ ( (Xt.+max_) - (Xt.-min_) )
-    Xt_ranged = ( Xt_scaled.+min_interval ) .* ( max_interval - min_interval )
-    # return the trapose of the Ranged Scaled Matrix
-    return transpose(Xt_ranged)
+abstract type AbstractTransformer end
+
+#=========================== Min Max Transformer ===========================#
+
+struct MinMaxTransformer <: AbstractTransformer
+    minimum_values::DataFrame
+    maximum_values::DataFrame
+end
+
+function MinMaxTransformer(X::DataFrame)::MinMaxTransformer
+    return MinMaxTransformer( mapcols(x->min(x...), X), mapcols(x->max(x...), X) )
+end
+
+function transform(transformer::MinMaxTransformer, X::DataFrame)::DataFrame
+    return (X .- transformer.minimum_values) ./ (transformer.maximum_values .- transformer.minimum_values)
+end
+
+
+#=========================== Mean Std Transformer ===========================#
+
+struct MeanStdTransformer <: AbstractTransformer
+    mean_values::DataFrame
+    std_values::DataFrame
+end
+
+function MeanStdTransformer(X::DataFrame)
+    # calculate std and mean together for efficiency
+    mean_and_std_values = mapcols(mean_and_std, a)
+    return MeanStdTransformer( mapcols(x->[ms[1] for ms in x], mean_and_std_values), mapcols(x->[ms[2] for ms in x], mean_and_std_values) )
+end
+
+function transform(transformer::MeanStdTransformer, X::DataFrame)::DataFrame
+    return (X .- transformer.mean_values) ./ transformer.std_values
 end
