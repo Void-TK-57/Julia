@@ -1,6 +1,7 @@
 # use packages
 using DataFrames
 using StatsBase
+using Statistics
 
 # include own files
 include("functools.jl")
@@ -61,6 +62,31 @@ end
 
 function transform(transformer::PolynomialTransformer, X::DataFrame)::DataFrame
     return rename(DataFrame([prod(name_combination, size(X)[1], i->X[i]) for name_combination in transformer.names_combination]), transformer.names_combined)
+end
+
+#=========================== Imputer Transformer ===========================#
+
+struct Imputer <: AbstractTransformer
+    missing_values
+    strategy::String
+    fill_value
+end
+
+function Imputer(X::DataFrame, missing_values, strategy::String, fill_value)
+    return Imputer(missing_values, strategy, fill_value)
+end
+
+function transform(transformer::Imputer, X::DataFrame)::DataFrame
+    # check strategy
+    if transformer.strategy == "mean"
+        f = v->mean(filter(x->x!==NaN, v))
+    elseif transformer.strategy == "median"
+        f = v->median(filter(x->x!==NaN, v))
+    else
+        f = v->transformer.fill_value
+    end
+    # for each column replace missing value by the value from f
+    return mapcols(x->replace(x, transformer.missing_values, f(x)), X)
 end
 
 #=========================== Pipeline Transformer ===========================#
