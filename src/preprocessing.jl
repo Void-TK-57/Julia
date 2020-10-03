@@ -39,3 +39,20 @@ end
 function transform(transformer::MeanStdTransformer, X::DataFrame)::DataFrame
     return (X .- transformer.mean_values) ./ transformer.std_values
 end
+
+#=========================== Polynomial Transformer ===========================#
+
+struct PolynomialTransformer <: AbstractTransformer
+    degree::Int64
+    include_bias::Bool
+    names_combination::Array{Tuple{Vararg{String,N} where N},1}
+    names::Array{String,1}
+end
+
+function PolynomialTransformer(X::DataFrame, degree::Int64, include_bias::Bool)
+    return PolynomialTransformer(degree, include_bias, combination_with_repetition(names(X), degree, include_bias), names(X))
+end
+
+function transform(transformer::PolynomialTransformer, X::DataFrame)
+    return rename(DataFrame([prod(name_combination, size(X)[1], i->X[i]) for name_combination in transformer.names_combination]), replace([ join( filter(x->x!="", [feature_to_n(i, count(x->x==i,name_combination)) for i in transformer.names]), '.')  for name_combination in transformer.names_combination], "", "1"))
+end
