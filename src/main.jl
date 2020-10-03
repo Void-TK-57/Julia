@@ -5,8 +5,9 @@ using Plots
 theme(:dark)
 using GLM
 
-include("machine_learning/model.jl")
+include("model.jl")
 include("functools.jl")
+include("preprocessing.jl")
 
 # set data folder
 data_folder = "/home/void/Desktop/Data"
@@ -32,10 +33,9 @@ function main()
 end
 
 function test()
-    sample = 1:10
-    println(sample)
-    scale = min_max_scale(sample[:, :])[:]
-    println(scale)
+    data = DataFrame(A=[1, 2, 3, 4, 5], B=[-1, 2, 1, -2, 0], C=[0, 0, -1, 0, 4])
+    println(data)
+    println(transform(MinMaxTransformer(data), data))
 end
 
 test()

@@ -1,3 +1,4 @@
+# use packages
 using IterTools
 using StatsBase
 
@@ -51,8 +52,15 @@ function features_names(features::Array{String,1}, degree::Int64, include_bias::
     return features
 end
 
-# function to get min and max values of each column
-function min_cols(m::Array{T,2})::Array{T,2} where {T <: Number} return [min(m[:, col]...) for col in 1:size(m)[2]][:, :] end
-function max_cols(m::Array{T,2})::Array{T,2} where {T <: Number} return [max(m[:, col]...) for col in 1:size(m)[2]][:, :] end
+# function to get min and max values of each column and each row
+function apply(m::Array{T,2}, f::Function, axis::Int64=1)::Array{Any,2} where {T <: Number}
+    if axis == 2
+        return [f(m[:, col]) for col in 1:size(m)[2]][:, :]
+    elseif axis == 1
+        return [f(m[row, :]) for row in 1:size(m)[1]][:, :]
+    else
+        throw(ArgumentError("Axis must be either 1 or 2"))
+    end
+end
 
 # terror_function(features, degree, include_bias) = [ length([v...]) == 0 ? "1" : join( filter(x->x!="", [ n_str(features[i], (addcounts!(Dict{Int64,Int64}(), [v...]))[i-1]) for i in 1:length(features) ]), '.')  for v in (chain([filter( issorted, Any[product(fill(0:length(features)-1, n)...)...]) for n in Int(!include_bias):degree]...) ) ] ]

@@ -1,9 +1,10 @@
-
+# use packages
 using LinearAlgebra
 
-include("regression.jl")
+# include own filesinclude("regression.jl")
 include("dataset.jl")
-include("../functools.jl")
+include("functools.jl")
+include("regression.jl")
 
 abstract type AbstractModel end
 abstract type AbstractLinearModel <: AbstractModel end

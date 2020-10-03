@@ -3,7 +3,7 @@
 using GLM
 
 # include own files
-include("../functools.jl")
+include("functools.jl")
 
 abstract type AbstractRegression end
 abstract type AbstractLinearRegression <: AbstractRegression end
