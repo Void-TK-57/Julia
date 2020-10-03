@@ -32,6 +32,9 @@ function test()
     println(data)
     x = PolynomialTransformer(data, 2, true)
     println( transform(x, data) )
+    # create pipeline
+    pipeline = Pipeline(data, [PolynomialTransformer, MinMaxTransformer], [(2, true), ()])
+    println( transform(pipeline, data) )
 end
 
-main()
+test()

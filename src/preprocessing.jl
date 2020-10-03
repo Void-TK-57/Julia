@@ -62,3 +62,32 @@ end
 function transform(transformer::PolynomialTransformer, X::DataFrame)::DataFrame
     return rename(DataFrame([prod(name_combination, size(X)[1], i->X[i]) for name_combination in transformer.names_combination]), transformer.names_combined)
 end
+
+#=========================== Pipeline Transformer ===========================#
+
+struct Pipeline <: AbstractTransformer
+    transformers::Array{T,1} where {T <: AbstractTransformer}
+end
+
+function Pipeline(X::DataFrame, transformers_types::Array{DataType,1}, args::Array{Tuple{Vararg{T,N} where N},1}) where {T <: Any}
+    # array of transformers
+    transformers = Array{AbstractTransformer,1}()
+    # for each value in the array of transformers
+    for i in 1:length(transformers_types)
+        # create the transformer with its args, push it to the vector, and call transform on X
+        transformer = transformers_types[i](X, args[i]...)
+        push!(transformers, transformer)
+        X = transform(transformer, X)
+    end
+    # call default constructor
+    return Pipeline(transformers)
+end
+
+function transform(pipe::Pipeline, X::DataFrame)::DataFrame
+    # for each transformer in the pipeline, apply the transform
+    for transformer in pipe.transformers
+        X = transform(transformer, X)
+    end
+    # return the final X calculated
+    return X
+end
