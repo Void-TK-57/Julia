@@ -21,21 +21,17 @@ function main()
     target = "csMPa"
     numerical = ["cement","slag","flyash","water","superplasticizer","coarseaggregate","fineaggregate","age"]
     categorical = String[]
-    degree = 3
+    degree = 1
     include_bias = true
     model = LinearModel(data, target, numerical, categorical, degree, include_bias)
-    p = predict(model, data)
-    plt = scatter(data[:csMPa], p)
-    # construct a identity line
-    interval = [min(p...), max(p...)]
-    plot!(interval, interval)
-    display(plt)
+    println(model.regression.coefficients)
 end
 
 function test()
-    data = DataFrame(A=[1, 2, 3, 4, 5], B=[-1, 2, 1, -2, 0], C=[0, 0, -1, 0, 4])
+    data = DataFrame(A=[1, 2, 3], B=[-1, 0, 1], C=[3, 2, 1])
     println(data)
-    println(transform(MinMaxTransformer(data), data))
+    x = PolynomialTransformer(data, 2, true)
+    println( transform(x, data) )
 end
 
-test()
+main()
