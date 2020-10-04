@@ -8,8 +8,10 @@ function is_nan(value::T)::Bool where {T <: Number}
     return isnan(value)
 end
 
-
-
+# explained variance score
+function explained_variance(y::Array{T,1}, y_::Array{V,1})::Float64 where {T <: Number, V <: Number}
+    return 1.0 - var(y-y_)/var(y)
+end
 # function to get all combinations with repetition up to the size passed (and whether it should inclue the empty set)
 function combination_with_repetition(array::Array{T,1}, size::Int64, include_empty_set::Bool)::Array{Tuple{Vararg{T,N} where N},1} where {T,N}
     return [chain([filter(issorted, [product(fill(array, d)...)...]) for d in Int(!include_empty_set):size]...)...]
