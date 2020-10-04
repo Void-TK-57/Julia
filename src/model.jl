@@ -25,4 +25,9 @@ LinearModel(dataset::DataSet, degree::Int64, include_bias::Bool) = LinearModel(d
 LinearModel(data::DataFrame, target::String, numerical_features::Array{String,1}, categorical_features::Array{String,1}, degree::Int64, include_bias::Bool) = LinearModel(DataSet(data, target, numerical_features, categorical_features), degree, include_bias)
 
 # predict function
-predict(model::LinearModel, X::DataFrame)::Array{Float64,1} = ( power_features(convert(Array{Float64,2}, X[:, model.data.numerical_features]), model.regression.degree, model.regression.include_bias)*model.regression.coefficients[:, :] )[:]
+function predict(model::LinearModel, X::DataFrame)::DataFrame
+    # get matrix of values times its coefficient
+    values = transform( model.regression.polynomial, X) .* model.regression.coefficients
+    # return the a Dataframe with the sum of the values per row
+    return DataFrame([sum( values[i, :] ) for i in 1:size(values)[1]][:, :], [model.data.target])
+end

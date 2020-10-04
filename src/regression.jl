@@ -13,8 +13,7 @@ abstract type AbstractLinearRegression <: AbstractRegression end
 abstract type AbstractNonLinearRegression <: AbstractRegression end
 
 struct LinearRegression <: AbstractLinearRegression
-    degree::Int64
-    include_bias::Bool
+    polynomial::PolynomialTransformer
     coefficients::DataFrame
 end
 
@@ -25,5 +24,5 @@ function LinearRegression(data::DataSet, degree::Int64=1, include_bias::Bool=tru
     # get X matrix expanded for the regression
     X = Matrix(transform(poly, data.data[data.numerical_features]))
     # do a linear regression and get its coefficients
-    return LinearRegression(degree, include_bias, rename(DataFrame( Matrix(transpose(coef(lm(X, convert(Array{Float64,1}, data.data[data.target]))) )) ), poly.names_combined) )
+    return LinearRegression(poly, rename(DataFrame( Matrix(transpose(coef(lm(X, convert(Array{Float64,1}, data.data[data.target]))) )) ), poly.names_combined) )
 end
