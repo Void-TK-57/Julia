@@ -32,6 +32,10 @@ function predict(model::LinearModel, X::DataFrame)::DataFrame
     return DataFrame([sum( values[i, :] ) for i in 1:size(values)[1]][:, :], [model.data.target])
 end
 
+function score(model::LinearModel, X::DataFrame, y::Array{T,1})::Float64 where T
+    return explained_variance(y, predict(model, X)[model.data.target])
+end
+
 function score(model::LinearModel)::Float64
-    return explained_variance(model.data.data[model.data.target], predict(model, model.data.data[model.data.numerical_features]))
+    return explained_variance(model.data.data[model.data.target], predict(model, model.data.data[model.data.numerical_features])[model.data.target])
 end

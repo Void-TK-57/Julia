@@ -1,6 +1,18 @@
 # use packages
 using IterTools
 using StatsBase
+using DataFrames
+using Random
+
+# function to split indices based on a dataframe
+function train_test_split(data::DataFrame, rate::Float64=0.1, doshuffle::Bool=false)
+    len = size(data)[1]
+    final_index = round(Int64, len*rate)
+    indices = doshuffle ? shuffle([1:len...]) : [1:len...]
+    return (indices[1:final_index], indices[final_index+1:end])
+end
+
+# k fold function with shuffle option
 
 # function to check if is nan, but for other types too
 is_nan(value)::Bool = false

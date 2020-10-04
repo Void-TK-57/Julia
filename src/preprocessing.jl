@@ -10,34 +10,34 @@ abstract type AbstractTransformer end
 
 #=========================== Min Max Transformer ===========================#
 
-struct MinMaxTransformer <: AbstractTransformer
+struct Normalizer <: AbstractTransformer
     minimum_values::DataFrame
     maximum_values::DataFrame
 end
 
-function MinMaxTransformer(X::DataFrame)::MinMaxTransformer
-    return MinMaxTransformer( mapcols(x->min(x...), X), mapcols(x->max(x...), X) )
+function Normalizer(X::DataFrame)::Normalizer
+    return Normalizer( mapcols(x->min(x...), X), mapcols(x->max(x...), X) )
 end
 
-function transform(transformer::MinMaxTransformer, X::DataFrame)::DataFrame
+function transform(transformer::Normalizer, X::DataFrame)::DataFrame
     return (X .- transformer.minimum_values) ./ (transformer.maximum_values .- transformer.minimum_values)
 end
 
 
 #=========================== Mean Std Transformer ===========================#
 
-struct MeanStdTransformer <: AbstractTransformer
+struct Standlizer <: AbstractTransformer
     mean_values::DataFrame
     std_values::DataFrame
 end
 
-function MeanStdTransformer(X::DataFrame)
+function Standlizer(X::DataFrame)::Standlizer
     # calculate std and mean together for efficiency
     mean_and_std_values = mapcols(mean_and_std, a)
-    return MeanStdTransformer( mapcols(x->[ms[1] for ms in x], mean_and_std_values), mapcols(x->[ms[2] for ms in x], mean_and_std_values) )
+    return Standlizer( mapcols(x->[ms[1] for ms in x], mean_and_std_values), mapcols(x->[ms[2] for ms in x], mean_and_std_values) )
 end
 
-function transform(transformer::MeanStdTransformer, X::DataFrame)::DataFrame
+function transform(transformer::Standlizer, X::DataFrame)::DataFrame
     return (X .- transformer.mean_values) ./ transformer.std_values
 end
 
@@ -62,31 +62,6 @@ end
 
 function transform(transformer::PolynomialTransformer, X::DataFrame)::DataFrame
     return rename(DataFrame([prod(name_combination, size(X)[1], i->X[i]) for name_combination in transformer.names_combination]), transformer.names_combined)
-end
-
-#=========================== Imputer Transformer ===========================#
-
-struct Imputer <: AbstractTransformer
-    missing_values
-    strategy::String
-    fill_value
-end
-
-function Imputer(X::DataFrame, missing_values, strategy::String, fill_value)
-    return Imputer(missing_values, strategy, fill_value)
-end
-
-function transform(transformer::Imputer, X::DataFrame)::DataFrame
-    # check strategy
-    if transformer.strategy == "mean"
-        f = v->mean(filter(x->x!==NaN, v))
-    elseif transformer.strategy == "median"
-        f = v->median(filter(x->x!==NaN, v))
-    else
-        f = v->transformer.fill_value
-    end
-    # for each column replace missing value by the value from f
-    return mapcols(x->replace(x, transformer.missing_values, f(x)), X)
 end
 
 #=========================== Pipeline Transformer ===========================#
@@ -116,4 +91,52 @@ function transform(pipe::Pipeline, X::DataFrame)::DataFrame
     end
     # return the final X calculated
     return X
+end#=========================== Imputer Transformer ===========================#
+
+struct Imputer <: AbstractTransformer
+    missing_values
+    strategy::String
+    fill_value
+end
+
+function Imputer(X::DataFrame, missing_values, strategy::String, fill_value)
+    return Imputer(missing_values, strategy, fill_value)
+end
+
+function transform(transformer::Imputer, X::DataFrame)::DataFrame
+    # check strategy
+    if transformer.strategy == "mean"
+        f = v->mean(filter(x->x!==NaN, v))
+    elseif transformer.strategy == "median"
+        f = v->median(filter(x->x!==NaN, v))
+    else
+        f = v->transformer.fill_value
+    end
+    # for each column replace missing value by the value from f
+    return mapcols(x->replace(x, transformer.missing_values, f(x)), X)
+end
+
+#=========================== Imputer Transformer ===========================#
+
+struct Imputer <: AbstractTransformer
+    missing_values
+    strategy::String
+    fill_value
+end
+
+function Imputer(X::DataFrame, missing_values, strategy::String, fill_value)
+    return Imputer(missing_values, strategy, fill_value)
+end
+
+function transform(transformer::Imputer, X::DataFrame)::DataFrame
+    # check strategy
+    if transformer.strategy == "mean"
+        f = v->mean(filter(x->x!==NaN, v))
+    elseif transformer.strategy == "median"
+        f = v->median(filter(x->x!==NaN, v))
+    else
+        f = v->transformer.fill_value
+    end
+    # for each column replace missing value by the value from f
+    return mapcols(x->replace(x, transformer.missing_values, f(x)), X)
 end
