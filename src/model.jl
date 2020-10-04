@@ -31,3 +31,7 @@ function predict(model::LinearModel, X::DataFrame)::DataFrame
     # return the a Dataframe with the sum of the values per row
     return DataFrame([sum( values[i, :] ) for i in 1:size(values)[1]][:, :], [model.data.target])
 end
+
+function score(model::LinearModel)::Float64
+    return explained_variance(model.data.data[model.data.target], predict(model, model.data.data[model.data.numerical_features]))
+end
